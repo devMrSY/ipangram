@@ -6,7 +6,7 @@ const EmployeesSchema = new Schema(
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
     email: { type: String, required: true },
-    password: { type: String, required: true, minlength: 8, maxlength: 20 },
+    password: { type: String, required: true },
     gender: { type: String, required: true },
     hobbiles: { type: String, required: true },
     department_id: { type: [String], required: false },

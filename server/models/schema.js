@@ -5,11 +5,16 @@ const EmployeesSchema = new Schema(
   {
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
-    email: { type: String, required: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+    },
     password: { type: String, required: true },
     gender: { type: String, required: true },
-    hobbiles: { type: String, required: true },
-    department_id: { type: [String], required: false },
+    // hobbiles: { type: String, required: true },
+    departmentIds: { type: [String], required: false },
     user_type: { type: String, required: true },
   },
   { timestamps: true }

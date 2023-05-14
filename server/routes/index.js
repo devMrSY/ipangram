@@ -13,8 +13,7 @@ router.post("/employees/sign-up", async (req, res) => {
       email,
       password,
       gender,
-      hobbiles,
-      department_id,
+      departmentIds,
       user_type,
     } = req.body;
     // Check if user with the email already exists
@@ -36,8 +35,7 @@ router.post("/employees/sign-up", async (req, res) => {
       email,
       password: hashedPassword,
       gender,
-      hobbiles,
-      department_id,
+      departmentIds,
       user_type,
     });
 
@@ -49,18 +47,15 @@ router.post("/employees/sign-up", async (req, res) => {
       "mysecretkey"
     );
 
-    res.status(201).json({ token });
+    res.status(201).json({ token, user_type, userId: user.id });
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "Internal server error", catch: error.message });
+    res.status(500).json({ message: error.message ?? "Internal server error" });
   }
 });
 
 router.post("/employees/login", async (req, res) => {
   try {
-    const { email, password, user_type } = req.body;
+    const { email, password } = req.body;
 
     // Check if user with the email exists
     const user = await Employees.findOne({ email });
@@ -77,26 +72,53 @@ router.post("/employees/login", async (req, res) => {
     // Create and sign a JWT token
     const token = jwt.sign({ userId: user._id }, "mysecretkey");
 
-    res.status(200).json({ user_type: user.user_type, token: token });
+    res
+      .status(200)
+      .json({ user_type: user.user_type, token: token, userId: user.id });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
 // get employee by id
-router.post("/employees/getDetailByUserId/:id", async (req, res) => {
+router.get("/employees/getDetailByUserId/:id", async (req, res) => {
   try {
     const user_id = req.params.id;
 
-    const user = await Employees.findOne({ _id: user_id });
+    const user = await Employees.findOne(
+      { _id: user_id },
+      { first_name: 1, last_name: 1, email: 1, departmentIds: 1 }
+    );
     if (!user) {
       return res.status(401).json({ message: "Invalid user id " + user_id });
     }
 
     res.status(200).json(user);
   } catch (error) {
-    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// update employees details
+router.put("/employees/updateById/:id", async (req, res) => {
+  try {
+    const { department_id } = req.body;
+
+    if (!department_id.length) {
+      return res.status(401).json({ message: "Nothing to update" });
+    }
+
+    const user = await Employees.findByIdAndUpdate(req.params.id, {
+      departmentIds: department_id,
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "employee not found" });
+    }
+    res
+      .status(200)
+      .json(`User Updated Successfully ${department_id.join(",")}`);
+  } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -115,7 +137,6 @@ router.post("/departments/create", async (req, res) => {
 
     res.status(201).json(department);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -127,7 +148,6 @@ router.get("/departments/getAll", async (req, res) => {
 
     res.status(200).json(departments);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -143,7 +163,6 @@ router.get("/departments/getById/:id", async (req, res) => {
 
     res.status(200).json(department);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -162,14 +181,12 @@ router.put("/departments/updateById/:id", async (req, res) => {
       },
       { new: true }
     );
-
     if (!department) {
       return res.status(404).json({ message: "Department not found" });
     }
 
     res.status(200).json(department);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -185,7 +202,6 @@ router.delete("/departments/delete/:id", async (req, res) => {
 
     res.status(200).json({ message: "Department deleted successfully" });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

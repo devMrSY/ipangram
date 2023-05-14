@@ -1,11 +1,16 @@
 const mongoose = require("mongoose");
 
-const db = () => {
-  mongoose
-    .connect("mongodb://127.0.0.1:27017/Ipangram", { useNewUrlParser: true })
-    .catch((e) => {
-      console.error("Connection error", e.message);
-    });
+const db = async () => {
+  const isLocalDb = false;
+  const url = isLocalDb
+    ? "mongodb://127.0.0.1:27017/Ipangram"
+    : process.env.MONGODB_URL;
+  try {
+    await mongoose.connect(url, { useNewUrlParser: true });
+    console.log("DB is connected!!");
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = db;

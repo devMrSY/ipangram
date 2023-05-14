@@ -4,6 +4,7 @@ const router = require("./routes/index.js");
 const db = require("./db/index.js");
 
 const app = express();
+require("dotenv").config();
 
 app.use(
   cors({
@@ -17,4 +18,4 @@ app.use("/api", router);
 
 db();
 
-app.listen(3000, () => console.log("Server started on port 3000"));
+app.listen(4000, () => console.log("Server started on port 4000"));

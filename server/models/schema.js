@@ -51,9 +51,6 @@ const DepartmentsSchema = new Schema(
 // );
 
 const Employees = mongoose.model("Employees", EmployeesSchema);
-const Departments = (module.exports = mongoose.model(
-  "Departments",
-  DepartmentsSchema
-));
+const Departments = mongoose.model("Departments", DepartmentsSchema);
 
 module.exports = { Employees, Departments };

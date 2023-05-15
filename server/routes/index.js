@@ -43,11 +43,13 @@ router.post("/employees/sign-up", async (req, res) => {
 
     // Create and sign a JWT token
     const token = jwt.sign(
-      { userId: user.id, user_type: user_type },
+      { user_type: user_type, userId: user.id },
       "mysecretkey"
     );
 
-    res.status(201).json({ token, user_type, userId: user.id });
+    res
+      .status(201)
+      .json({ user_type: user.user_type, token: token, userId: user.id });
   } catch (error) {
     res.status(500).json({ message: error.message ?? "Internal server error" });
   }
@@ -70,7 +72,10 @@ router.post("/employees/login", async (req, res) => {
     }
 
     // Create and sign a JWT token
-    const token = jwt.sign({ userId: user._id }, "mysecretkey");
+    const token = jwt.sign(
+      { userId: user._id, user_type: user.user_type },
+      "mysecretkey"
+    );
 
     res
       .status(200)
